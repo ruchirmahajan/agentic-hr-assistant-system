@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agentic HR Assistant - Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        .transition-all {
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- Header -->
+    <header class="gradient-bg text-white shadow-lg">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-users text-2xl"></i>
+                    <h1 class="text-2xl font-bold">Agentic HR Assistant</h1>
+                    <span class="bg-green-500 text-xs px-2 py-1 rounded-full">🆓 FREE</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm">Welcome, Admin</span>
+                    <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg text-sm transition-all">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container mx-auto px-6 py-8">
+        <!-- Dashboard Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+            <div class="bg-white rounded-xl shadow-lg p-6 card-hover transition-all">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-gray-500 text-sm font-medium">Total Candidates</h3>
+                        <p class="text-3xl font-bold text-blue-600" id="total-candidates">0</p>
+                    </div>
+                    <i class="fas fa-user-friends text-blue-500 text-2xl"></i>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl shadow-lg p-6 card-hover transition-all">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-gray-500 text-sm font-medium">Active Jobs</h3>
+                        <p class="text-3xl font-bold text-green-600" id="active-jobs">0</p>
+                    </div>
+                    <i class="fas fa-briefcase text-green-500 text-2xl"></i>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl shadow-lg p-6 card-hover transition-all">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-gray-500 text-sm font-medium">Applications</h3>
+                        <p class="text-3xl font-bold text-purple-600" id="total-applications">0</p>
+                    </div>
+                    <i class="fas fa-file-alt text-purple-500 text-2xl"></i>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl shadow-lg p-6 card-hover transition-all">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-gray-500 text-sm font-medium">Scheduled Interviews</h3>
+                        <p class="text-3xl font-bold text-indigo-600" id="scheduled-interviews">0</p>
+                    </div>
+                    <i class="fas fa-calendar-check text-indigo-500 text-2xl"></i>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl shadow-lg p-6 card-hover transition-all">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-gray-500 text-sm font-medium">Active Panels</h3>
+                        <p class="text-3xl font-bold text-teal-600" id="active-panels">0</p>
+                    </div>
+                    <i class="fas fa-users-cog text-teal-500 text-2xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <button onclick="showSection('candidates')" class="bg-blue-600 hover:bg-blue-700 text-white rounded-xl p-6 text-center transition-all card-hover">
+                <i class="fas fa-user-plus text-3xl mb-3"></i>
+                <h3 class="text-xl font-semibold">Manage Candidates</h3>
+                <p class="text-blue-100 mt-2">Add, view, and analyze candidates</p>
+            </button>
+            <button onclick="showSection('jobs')" class="bg-green-600 hover:bg-green-700 text-white rounded-xl p-6 text-center transition-all card-hover">
+                <i class="fas fa-plus-circle text-3xl mb-3"></i>
+                <h3 class="text-xl font-semibold">Create Jobs</h3>
+                <p class="text-green-100 mt-2">Post new job openings</p>
+            </button>
+            <button onclick="showSection('interviews')" class="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl p-6 text-center transition-all card-hover">
+                <i class="fas fa-calendar-alt text-3xl mb-3"></i>
+                <h3 class="text-xl font-semibold">Interviews</h3>
+                <p class="text-indigo-100 mt-2">Schedule & manage interviews</p>
+            </button>
+            <button onclick="showSection('applications')" class="bg-purple-600 hover:bg-purple-700 text-white rounded-xl p-6 text-center transition-all card-hover">
+                <i class="fas fa-clipboard-list text-3xl mb-3"></i>
+                <h3 class="text-xl font-semibold">Review Applications</h3>
+                <p class="text-purple-100 mt-2">Track and manage applications</p>
+            </button>
+        </div>
+
+        <!-- Content Sections -->
+        <div id="dashboard-section" class="dashboard-content">
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">System Status</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="border border-gray-200 rounded-lg p-4">
+                        <h3 class="font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-server text-blue-500"></i> System Health
+                        </h3>
+                        <div class="flex items-center space-x-2">
+                            <span class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
+                            <span class="text-green-600 font-medium" id="system-status">Checking...</span>
+                        </div>
+                    </div>
+                    <div class="border border-gray-200 rounded-lg p-4">
+                        <h3 class="font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-database text-green-500"></i> Database
+                        </h3>
+                        <div class="flex items-center space-x-2">
+                            <span class="w-3 h-3 bg-green-500 rounded-full"></span>
+                            <span class="text-green-600 font-medium">SQLite Connected</span>
+                        </div>
+                    </div>
+                    <div class="border border-gray-200 rounded-lg p-4">
+                        <h3 class="font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-brain text-orange-500"></i> AI Service
+                        </h3>
+                        <div class="flex items-center space-x-2">
+                            <span class="w-3 h-3 bg-orange-500 rounded-full"></span>
+                            <span class="text-orange-600 font-medium">Free Rule-based AI</span>
+                        </div>
+                    </div>
+                    <div class="border border-gray-200 rounded-lg p-4">
+                        <h3 class="font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-folder text-blue-500"></i> Storage
+                        </h3>
+                        <div class="flex items-center space-x-2">
+                            <span class="w-3 h-3 bg-blue-500 rounded-full"></span>
+                            <span class="text-blue-600 font-medium">Local File System</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Candidates Section -->
+        <div id="candidates-section" class="dashboard-content hidden">
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">Candidates Management</h2>
+                    <button onclick="showAddCandidateModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-all">
+                        <i class="fas fa-plus"></i> Add Candidate
+                    </button>
+                </div>
+                <div id="candidates-list" class="space-y-4">
+                    <!-- Candidates will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Jobs Section -->
+        <div id="jobs-section" class="dashboard-content hidden">
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">Job Management</h2>
+                    <button onclick="showAddJobModal()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg transition-all">
+                        <i class="fas fa-plus"></i> Create Job
+                    </button>
+                </div>
+                <div id="jobs-list" class="space-y-4">
+                    <!-- Jobs will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Applications Section -->
+        <div id="applications-section" class="dashboard-content hidden">
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Applications Review</h2>
+                <div id="applications-list" class="space-y-4">
+                    <!-- Applications will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Interviews Section -->
+        <div id="interviews-section" class="dashboard-content hidden">
+            <!-- Sub-navigation tabs -->
+            <div class="bg-white rounded-xl shadow-lg mb-6">
+                <div class="flex border-b border-gray-200">
+                    <button onclick="showInterviewTab('panels')" id="tab-panels" class="interview-tab flex-1 py-4 px-6 text-center font-semibold text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50">
+                        <i class="fas fa-users-cog mr-2"></i> Interview Panels
+                    </button>
+                    <button onclick="showInterviewTab('slots')" id="tab-slots" class="interview-tab flex-1 py-4 px-6 text-center font-semibold text-gray-500 hover:text-gray-700 hover:bg-gray-50">
+                        <i class="fas fa-clock mr-2"></i> Time Slots
+                    </button>
+                    <button onclick="showInterviewTab('scheduled')" id="tab-scheduled" class="interview-tab flex-1 py-4 px-6 text-center font-semibold text-gray-500 hover:text-gray-700 hover:bg-gray-50">
+                        <i class="fas fa-calendar-check mr-2"></i> Scheduled Interviews
+                    </button>
+                </div>
+            </div>
+
+            <!-- Panels Tab Content -->
+            <div id="panels-content" class="interview-content bg-white rounded-xl shadow-lg p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">Interview Panels</h2>
+                    <button onclick="showAddPanelModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg transition-all">
+                        <i class="fas fa-plus"></i> Create Panel
+                    </button>
+                </div>
+                <div id="panels-list" class="space-y-4">
+                    <!-- Panels will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Slots Tab Content -->
+            <div id="slots-content" class="interview-content hidden bg-white rounded-xl shadow-lg p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">Interview Slots</h2>
+                    <div class="flex space-x-3">
+                        <button onclick="showAddSlotModal()" class="bg-teal-600 hover:bg-teal-700 text-white px-6 py-2 rounded-lg transition-all">
+                            <i class="fas fa-plus"></i> Add Single Slot
+                        </button>
+                        <button onclick="showBulkSlotModal()" class="bg-cyan-600 hover:bg-cyan-700 text-white px-6 py-2 rounded-lg transition-all">
+                            <i class="fas fa-calendar-plus"></i> Generate Bulk Slots
+                        </button>
+                    </div>
+                </div>
+                <!-- Filters -->
+                <div class="flex flex-wrap gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
+                    <select id="slot-panel-filter" onchange="loadSlots()" class="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-teal-500">
+                        <option value="">All Panels</option>
+                    </select>
+                    <select id="slot-status-filter" onchange="loadSlots()" class="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-teal-500">
+                        <option value="">All Status</option>
+                        <option value="available">Available</option>
+                        <option value="booked">Booked</option>
+                        <option value="blocked">Blocked</option>
+                    </select>
+                    <input type="date" id="slot-date-from" onchange="loadSlots()" class="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-teal-500">
+                    <input type="date" id="slot-date-to" onchange="loadSlots()" class="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-teal-500">
+                </div>
+                <div id="slots-list" class="space-y-4">
+                    <!-- Slots will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Scheduled Tab Content -->
+            <div id="scheduled-content" class="interview-content hidden bg-white rounded-xl shadow-lg p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">Scheduled Interviews</h2>
+                    <button onclick="showScheduleInterviewModal()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg transition-all">
+                        <i class="fas fa-calendar-plus"></i> Schedule Interview
+                    </button>
+                </div>
+                <!-- Filters -->
+                <div class="flex flex-wrap gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
+                    <select id="interview-level-filter" onchange="loadInterviews()" class="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-green-500">
+                        <option value="">All Levels</option>
+                        <option value="screening">Screening</option>
+                        <option value="technical_1">Technical Round 1</option>
+                        <option value="technical_2">Technical Round 2</option>
+                        <option value="managerial">Managerial</option>
+                        <option value="hr">HR</option>
+                        <option value="final">Final</option>
+                    </select>
+                    <select id="interview-status-filter" onchange="loadInterviews()" class="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-green-500">
+                        <option value="">All Status</option>
+                        <option value="scheduled">Scheduled</option>
+                        <option value="in_progress">In Progress</option>
+                        <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </div>
+                <div id="interviews-list" class="space-y-4">
+                    <!-- Interviews will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Candidate Modal -->
+    <div id="add-candidate-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4">
+            <h3 class="text-xl font-bold mb-4">Add New Candidate</h3>
+            <form id="candidate-form" class="space-y-4">
+                <input type="text" id="candidate-name" placeholder="Full Name" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500" required>
+                <input type="email" id="candidate-email" placeholder="Email" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500" required>
+                <input type="tel" id="candidate-phone" placeholder="Phone (optional)" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500">
+                <input type="file" id="candidate-resume" accept=".pdf,.doc,.docx,.txt" class="w-full border border-gray-300 rounded-lg px-4 py-2">
+                <div class="flex space-x-3">
+                    <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition-all">Add Candidate</button>
+                    <button type="button" onclick="closeModal('add-candidate-modal')" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-2 rounded-lg transition-all">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Job Modal -->
+    <div id="add-job-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-xl p-8 max-w-lg w-full mx-4">
+            <h3 class="text-xl font-bold mb-4">Create New Job</h3>
+            <form id="job-form" class="space-y-4">
+                <input type="text" id="job-title" placeholder="Job Title" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-green-500" required>
+                <textarea id="job-description" placeholder="Job Description" rows="3" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-green-500" required></textarea>
+                <input type="text" id="job-department" placeholder="Department" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-green-500" required>
+                <input type="text" id="job-location" placeholder="Location" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-green-500" required>
+                <select id="job-type" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-green-500" required>
+                    <option value="">Employment Type</option>
+                    <option value="full-time">Full-time</option>
+                    <option value="part-time">Part-time</option>
+                    <option value="contract">Contract</option>
+                </select>
+                <div class="flex space-x-3">
+                    <button type="submit" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg transition-all">Create Job</button>
+                    <button type="button" onclick="closeModal('add-job-modal')" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-2 rounded-lg transition-all">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- View Candidate Modal -->
+    <div id="view-candidate-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-90vh overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold text-gray-900">Candidate Details</h2>
+                    <button onclick="closeModal('view-candidate-modal')" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div id="candidate-details-content" class="space-y-4">
+                    <!-- Content will be populated by JavaScript -->
+                </div>
+                <div class="mt-6 flex justify-end">
+                    <button onclick="closeModal('view-candidate-modal')" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-all">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Candidate Modal -->
+    <div id="edit-candidate-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-90vh overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold text-gray-900">Edit Candidate</h2>
+                    <button onclick="closeModal('edit-candidate-modal')" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <form id="edit-candidate-form" class="space-y-4">
+                    <input type="hidden" id="edit-candidate-id">
+                    <input type="text" id="edit-candidate-name" placeholder="Full Name" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500" required>
+                    <input type="email" id="edit-candidate-email" placeholder="Email" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500" required>
+                    <input type="tel" id="edit-candidate-phone" placeholder="Phone" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500">
+                    <input type="text" id="edit-candidate-position" placeholder="Current Position" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500">
+                    <input type="text" id="edit-candidate-company" placeholder="Current Company" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500">
+                    <input type="number" id="edit-candidate-experience" placeholder="Years of Experience" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500" min="0">
+                    <div class="flex space-x-3 mt-6">
+                        <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition-all">Save Changes</button>
+                        <button type="button" onclick="closeModal('edit-candidate-modal')" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-2 rounded-lg transition-all">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Job Modal -->
+    <div id="view-job-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-90vh overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold text-gray-900">Job Details</h2>
+                    <button onclick="closeModal('view-job-modal')" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div id="job-details-content" class="space-y-4">
+                    <!-- Content will be populated by JavaScript -->
+                </div>
+                <div class="mt-6 flex justify-end">
+                    <button onclick="closeModal('view-job-modal')" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-all">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Job Modal -->
+    <div id="edit-job-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-90vh overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold text-gray-900">Edit Job</h2>
+                    <button onclick="closeModal('edit-job-modal')" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <form id="edit-job-form" class="space-y-4">
+                    <input type="hidden" id="edit-job-id">
+                    <input type="text" id="edit-job-title" placeholder="Job Title" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-green-500" required>
+                    <textarea id="edit-job-description" placeholder="Job Description" rows="3" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-green-500" required></textarea>
+                    <textarea id="edit-job-requirements" placeholder="Job Requirements" rows="3" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-green-500"></textarea>
+                    <input type="text" id="edit-job-department" placeholder="Department" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-green-500" required>
+                    <input type="text" id="edit-job-location" placeholder="Location" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-green-500" required>
+                    <select id="edit-job-type" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-green-500" required>
+                        <option value="">Select Job Type</option>
+                        <option value="full-time">Full-time</option>
+                        <option value="part-time">Part-time</option>
+                        <option value="contract">Contract</option>
+                        <option value="internship">Internship</option>
+                    </select>
+                    <select id="edit-job-level" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-green-500" required>
+                        <option value="">Select Experience Level</option>
+                        <option value="entry">Entry Level</option>
+                        <option value="mid">Mid Level</option>
+                        <option value="senior">Senior Level</option>
+                    </select>
+                    <div class="flex space-x-3 mt-6">
+                        <button type="submit" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg transition-all">Save Changes</button>
+                        <button type="button" onclick="closeModal('edit-job-modal')" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-2 rounded-lg transition-all">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Panel Modal -->
+    <div id="add-panel-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-xl p-8 max-w-lg w-full mx-4 max-h-90vh overflow-y-auto">
+            <h3 class="text-xl font-bold mb-4">Create Interview Panel</h3>
+            <form id="panel-form" class="space-y-4">
+                <input type="text" id="panel-name" placeholder="Panel Name (e.g., Technical Interview Panel)" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-indigo-500" required>
+                <select id="panel-level" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-indigo-500" required>
+                    <option value="">Select Interview Level</option>
+                    <option value="screening">Screening</option>
+                    <option value="technical_1">Technical Round 1</option>
+                    <option value="technical_2">Technical Round 2</option>
+                    <option value="managerial">Managerial</option>
+                    <option value="hr">HR</option>
+                    <option value="final">Final</option>
+                </select>
+                <input type="text" id="panel-department" placeholder="Department (optional)" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-indigo-500">
+                <textarea id="panel-description" placeholder="Description (optional)" rows="2" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-indigo-500"></textarea>
+                
+                <div class="grid grid-cols-3 gap-4">
+                    <div>
+                        <label class="text-sm text-gray-600">Max Interviews/Day</label>
+                        <input type="number" id="panel-max-interviews" value="5" min="1" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="text-sm text-gray-600">Duration (mins)</label>
+                        <input type="number" id="panel-duration" value="60" min="15" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="text-sm text-gray-600">Buffer (mins)</label>
+                        <input type="number" id="panel-buffer" value="15" min="0" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-indigo-500">
+                    </div>
+                </div>
+
+                <!-- Interviewers Section -->
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <h4 class="font-semibold text-gray-700 mb-3">Panel Members</h4>
+                    <div id="interviewers-list" class="space-y-2 mb-3">
+                        <!-- Interviewer rows will be added here -->
+                    </div>
+                    <button type="button" onclick="addInterviewerRow()" class="text-indigo-600 hover:text-indigo-800 text-sm">
+                        <i class="fas fa-plus"></i> Add Interviewer
+                    </button>
+                </div>
+
+                <input type="text" id="panel-skills" placeholder="Skills Evaluated (comma-separated)" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-indigo-500">
+                
+                <div class="flex space-x-3">
+                    <button type="submit" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-lg transition-all">Create Panel</button>
+                    <button type="button" onclick="closeModal('add-panel-modal')" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-2 rounded-lg transition-all">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- View Panel Modal -->
+    <div id="view-panel-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-90vh overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold text-gray-900">Panel Details</h2>
+                    <button onclick="closeModal('view-panel-modal')" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div id="panel-details-content" class="space-y-4">
+                    <!-- Content will be populated by JavaScript -->
+                </div>
+                <div class="mt-6 flex justify-end">
+                    <button onclick="closeModal('view-panel-modal')" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-all">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Single Slot Modal -->
+    <div id="add-slot-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4">
+            <h3 class="text-xl font-bold mb-4">Add Interview Slot</h3>
+            <form id="slot-form" class="space-y-4">
+                <select id="slot-panel" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-teal-500" required>
+                    <option value="">Select Panel</option>
+                </select>
+                <input type="date" id="slot-date" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-teal-500" required>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-sm text-gray-600">Start Time</label>
+                        <input type="time" id="slot-start" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-teal-500" required>
+                    </div>
+                    <div>
+                        <label class="text-sm text-gray-600">End Time</label>
+                        <input type="time" id="slot-end" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-teal-500" required>
+                    </div>
+                </div>
+                <textarea id="slot-notes" placeholder="Notes (optional)" rows="2" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-teal-500"></textarea>
+                <div class="flex space-x-3">
+                    <button type="submit" class="flex-1 bg-teal-600 hover:bg-teal-700 text-white py-2 rounded-lg transition-all">Add Slot</button>
+                    <button type="button" onclick="closeModal('add-slot-modal')" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-2 rounded-lg transition-all">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bulk Slot Generation Modal -->
+    <div id="bulk-slot-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-xl p-8 max-w-lg w-full mx-4">
+            <h3 class="text-xl font-bold mb-4">Generate Bulk Interview Slots</h3>
+            <form id="bulk-slot-form" class="space-y-4">
+                <select id="bulk-slot-panel" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-cyan-500" required>
+                    <option value="">Select Panel</option>
+                </select>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-sm text-gray-600">From Date</label>
+                        <input type="date" id="bulk-date-from" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-cyan-500" required>
+                    </div>
+                    <div>
+                        <label class="text-sm text-gray-600">To Date</label>
+                        <input type="date" id="bulk-date-to" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-cyan-500" required>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-sm text-gray-600">Start Hour (e.g., 9 for 9 AM)</label>
+                        <input type="number" id="bulk-start-hour" value="9" min="0" max="23" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-cyan-500" required>
+                    </div>
+                    <div>
+                        <label class="text-sm text-gray-600">End Hour (e.g., 17 for 5 PM)</label>
+                        <input type="number" id="bulk-end-hour" value="17" min="0" max="23" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-cyan-500" required>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-sm text-gray-600">Slot Duration (mins)</label>
+                        <input type="number" id="bulk-duration" value="60" min="15" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-cyan-500" required>
+                    </div>
+                    <div>
+                        <label class="text-sm text-gray-600">Break Between (mins)</label>
+                        <input type="number" id="bulk-break" value="15" min="0" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-cyan-500" required>
+                    </div>
+                </div>
+                <div class="flex space-x-3">
+                    <button type="submit" class="flex-1 bg-cyan-600 hover:bg-cyan-700 text-white py-2 rounded-lg transition-all">Generate Slots</button>
+                    <button type="button" onclick="closeModal('bulk-slot-modal')" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-2 rounded-lg transition-all">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Schedule Interview Modal -->
+    <div id="schedule-interview-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-xl p-8 max-w-lg w-full mx-4 max-h-90vh overflow-y-auto">
+            <h3 class="text-xl font-bold mb-4">Schedule Interview</h3>
+            <form id="schedule-interview-form" class="space-y-4">
+                <select id="interview-candidate" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-green-500" required>
+                    <option value="">Select Candidate</option>
+                </select>
+                <select id="interview-job" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-green-500" required>
+                    <option value="">Select Job</option>
+                </select>
+                <select id="interview-panel" onchange="loadPanelSlots()" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-green-500" required>
+                    <option value="">Select Panel</option>
+                </select>
+                <select id="interview-level" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-green-500" required>
+                    <option value="">Select Level</option>
+                    <option value="screening">Screening</option>
+                    <option value="technical_1">Technical Round 1</option>
+                    <option value="technical_2">Technical Round 2</option>
+                    <option value="managerial">Managerial</option>
+                    <option value="hr">HR</option>
+                    <option value="final">Final</option>
+                </select>
+                
+                <!-- Available Slots -->
+                <div id="available-slots-section" class="hidden">
+                    <label class="text-sm text-gray-600">Available Slots</label>
+                    <select id="interview-slot" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-green-500">
+                        <option value="">Select Available Slot (Optional)</option>
+                    </select>
+                </div>
+                
+                <!-- Manual Date/Time -->
+                <div id="manual-datetime-section">
+                    <label class="text-sm text-gray-600">Or Set Custom Date/Time</label>
+                    <input type="date" id="interview-date" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-green-500 mb-2">
+                    <div class="grid grid-cols-2 gap-4">
+                        <input type="time" id="interview-start" class="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-green-500">
+                        <input type="time" id="interview-end" class="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-green-500">
+                    </div>
+                </div>
+
+                <select id="interview-mode" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-green-500" required>
+                    <option value="video">Video Call</option>
+                    <option value="phone">Phone</option>
+                    <option value="in_person">In Person</option>
+                </select>
+                <input type="text" id="interview-meeting-link" placeholder="Meeting Link (for video calls)" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-green-500">
+                <input type="text" id="interview-location" placeholder="Location (for in-person)" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-green-500">
+                
+                <div class="flex space-x-3">
+                    <button type="submit" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg transition-all">Schedule</button>
+                    <button type="button" onclick="closeModal('schedule-interview-modal')" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-2 rounded-lg transition-all">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- View Interview Modal -->
+    <div id="view-interview-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-3xl w-full mx-4 max-h-90vh overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold text-gray-900">Interview Details</h2>
+                    <button onclick="closeModal('view-interview-modal')" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div id="interview-details-content" class="space-y-4">
+                    <!-- Content will be populated by JavaScript -->
+                </div>
+                <div class="mt-6 flex justify-end space-x-3">
+                    <button onclick="closeModal('view-interview-modal')" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-all">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Feedback Modal -->
+    <div id="add-feedback-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-xl p-8 max-w-lg w-full mx-4 max-h-90vh overflow-y-auto">
+            <h3 class="text-xl font-bold mb-4">Add Interview Feedback</h3>
+            <form id="feedback-form" class="space-y-4">
+                <input type="hidden" id="feedback-interview-id">
+                <input type="text" id="feedback-interviewer-name" placeholder="Your Name" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-purple-500" required>
+                <input type="text" id="feedback-interviewer-role" placeholder="Your Role (e.g., Senior Engineer)" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-purple-500">
+                
+                <div>
+                    <label class="text-sm text-gray-600">Overall Score (1-10)</label>
+                    <input type="number" id="feedback-score" min="1" max="10" step="0.5" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-purple-500" required>
+                </div>
+                
+                <textarea id="feedback-strengths" placeholder="Candidate Strengths" rows="2" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-purple-500"></textarea>
+                <textarea id="feedback-weaknesses" placeholder="Areas of Improvement" rows="2" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-purple-500"></textarea>
+                <textarea id="feedback-comments" placeholder="Additional Comments" rows="3" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-purple-500"></textarea>
+                
+                <select id="feedback-recommendation" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-purple-500" required>
+                    <option value="">Select Recommendation</option>
+                    <option value="strong_yes">Strong Yes - Hire</option>
+                    <option value="yes">Yes - Proceed to Next Round</option>
+                    <option value="maybe">Maybe - Need More Info</option>
+                    <option value="no">No - Do Not Proceed</option>
+                    <option value="strong_no">Strong No - Reject</option>
+                </select>
+                
+                <div class="flex space-x-3">
+                    <button type="submit" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-lg transition-all">Submit Feedback</button>
+                    <button type="button" onclick="closeModal('add-feedback-modal')" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-2 rounded-lg transition-all">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Upload Document Modal -->
+    <div id="upload-document-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center" style="z-index: 9999;">
+        <div class="bg-white rounded-xl p-8 max-w-2xl w-full mx-4 max-h-90vh overflow-y-auto">
+            <h3 class="text-xl font-bold mb-4"><i class="fas fa-file-upload text-cyan-500 mr-2"></i>Upload Document</h3>
+            <form id="document-upload-form" class="space-y-4" enctype="multipart/form-data">
+                <input type="hidden" id="doc-candidate-id">
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-sm text-gray-600 font-medium">Document Type *</label>
+                        <select id="doc-type" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-cyan-500" required>
+                            <option value="">Select Type</option>
+                            <option value="resume">Resume/CV</option>
+                            <option value="cover_letter">Cover Letter</option>
+                            <option value="identity_proof">Identity Proof</option>
+                            <option value="address_proof">Address Proof</option>
+                            <option value="education_certificate">Education Certificate</option>
+                            <option value="marksheet">Marksheet</option>
+                            <option value="degree_certificate">Degree Certificate</option>
+                            <option value="experience_letter">Experience Letter</option>
+                            <option value="relieving_letter">Relieving Letter</option>
+                            <option value="salary_slip">Salary Slip</option>
+                            <option value="offer_letter">Offer Letter</option>
+                            <option value="portfolio">Portfolio</option>
+                            <option value="certification">Certification</option>
+                            <option value="reference_letter">Reference Letter</option>
+                            <option value="background_check">Background Check</option>
+                            <option value="medical_certificate">Medical Certificate</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-sm text-gray-600 font-medium">Subtype (Optional)</label>
+                        <input type="text" id="doc-subtype" placeholder="e.g., Passport, 10th Marksheet" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-cyan-500">
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="text-sm text-gray-600 font-medium">Document Title *</label>
+                    <input type="text" id="doc-title" placeholder="e.g., B.Tech Degree Certificate" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-cyan-500" required>
+                </div>
+                
+                <div>
+                    <label class="text-sm text-gray-600 font-medium">File *</label>
+                    <input type="file" id="doc-file" accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.xls,.xlsx,.csv" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-cyan-500" required>
+                    <p class="text-xs text-gray-500 mt-1">Allowed: PDF, DOC, DOCX, TXT, JPG, PNG, XLS, XLSX (Max 15MB)</p>
+                </div>
+                
+                <div>
+                    <label class="text-sm text-gray-600 font-medium">Description (Optional)</label>
+                    <textarea id="doc-description" placeholder="Brief description of the document" rows="2" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-cyan-500"></textarea>
+                </div>
+                
+                <!-- Conditional fields based on document type -->
+                <div id="doc-identity-fields" class="hidden space-y-4 p-4 bg-blue-50 rounded-lg">
+                    <h4 class="font-medium text-blue-800">Identity Document Details</h4>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-sm text-gray-600">Document Number</label>
+                            <input type="text" id="doc-number" placeholder="e.g., Passport Number" class="w-full border border-gray-300 rounded-lg px-4 py-2">
+                        </div>
+                        <div>
+                            <label class="text-sm text-gray-600">Issuing Authority</label>
+                            <input type="text" id="doc-issuing-authority" placeholder="e.g., Govt. of India" class="w-full border border-gray-300 rounded-lg px-4 py-2">
+                        </div>
+                        <div>
+                            <label class="text-sm text-gray-600">Issue Date</label>
+                            <input type="date" id="doc-issue-date" class="w-full border border-gray-300 rounded-lg px-4 py-2">
+                        </div>
+                        <div>
+                            <label class="text-sm text-gray-600">Expiry Date</label>
+                            <input type="date" id="doc-expiry-date" class="w-full border border-gray-300 rounded-lg px-4 py-2">
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="doc-education-fields" class="hidden space-y-4 p-4 bg-green-50 rounded-lg">
+                    <h4 class="font-medium text-green-800">Education Document Details</h4>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-sm text-gray-600">Institution Name</label>
+                            <input type="text" id="doc-institution" placeholder="e.g., IIT Delhi" class="w-full border border-gray-300 rounded-lg px-4 py-2">
+                        </div>
+                        <div>
+                            <label class="text-sm text-gray-600">Year of Passing</label>
+                            <input type="number" id="doc-year" placeholder="e.g., 2020" min="1950" max="2030" class="w-full border border-gray-300 rounded-lg px-4 py-2">
+                        </div>
+                        <div>
+                            <label class="text-sm text-gray-600">Grade/Percentage</label>
+                            <input type="text" id="doc-grade" placeholder="e.g., 85% or A+" class="w-full border border-gray-300 rounded-lg px-4 py-2">
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="doc-experience-fields" class="hidden space-y-4 p-4 bg-purple-50 rounded-lg">
+                    <h4 class="font-medium text-purple-800">Experience Document Details</h4>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-sm text-gray-600">Company Name</label>
+                            <input type="text" id="doc-company" placeholder="e.g., Google" class="w-full border border-gray-300 rounded-lg px-4 py-2">
+                        </div>
+                        <div>
+                            <label class="text-sm text-gray-600">Designation</label>
+                            <input type="text" id="doc-designation" placeholder="e.g., Senior Engineer" class="w-full border border-gray-300 rounded-lg px-4 py-2">
+                        </div>
+                        <div>
+                            <label class="text-sm text-gray-600">Period From</label>
+                            <input type="date" id="doc-period-from" class="w-full border border-gray-300 rounded-lg px-4 py-2">
+                        </div>
+                        <div>
+                            <label class="text-sm text-gray-600">Period To</label>
+                            <input type="date" id="doc-period-to" class="w-full border border-gray-300 rounded-lg px-4 py-2">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-sm text-gray-600 font-medium">Access Level</label>
+                        <select id="doc-access" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-cyan-500">
+                            <option value="panel_view">Panel View (Interview panels can view)</option>
+                            <option value="all_interviewers">All Interviewers</option>
+                            <option value="hr_only">HR Only</option>
+                            <option value="restricted">Restricted</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-sm text-gray-600 font-medium">Tags (Optional)</label>
+                        <input type="text" id="doc-tags" placeholder="e.g., verified, urgent" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-cyan-500">
+                    </div>
+                </div>
+                
+                <div class="flex space-x-3 pt-4">
+                    <button type="submit" class="flex-1 py-2 rounded-lg transition-all font-semibold" style="background-color: #059669; color: white;">
+                        <i class="fas fa-upload mr-2"></i>Upload Document
+                    </button>
+                    <button type="button" onclick="closeModal('upload-document-modal')" class="flex-1 py-2 rounded-lg transition-all" style="background-color: #6b7280; color: white;">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- View Document Modal -->
+    <div id="view-document-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center" style="z-index: 9999;">
+        <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-90vh overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold text-gray-900"><i class="fas fa-file-alt text-cyan-500 mr-2"></i>Document Details</h2>
+                    <button onclick="closeModal('view-document-modal')" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div id="document-details-content" class="space-y-4">
+                    <!-- Content will be populated by JavaScript -->
+                </div>
+                <div class="mt-6 flex justify-end space-x-3">
+                    <button onclick="closeModal('view-document-modal')" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-all">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Verify Document Modal -->
+    <div id="verify-document-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center" style="z-index: 9999;">
+        <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4">
+            <h3 class="text-xl font-bold mb-4"><i class="fas fa-check-circle text-green-500 mr-2"></i>Verify Document</h3>
+            <form id="verify-document-form" class="space-y-4">
+                <input type="hidden" id="verify-doc-id">
+                
+                <div>
+                    <label class="text-sm text-gray-600 font-medium">Verification Status</label>
+                    <select id="verify-status" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-green-500" required>
+                        <option value="">Select Status</option>
+                        <option value="verified">✓ Verified</option>
+                        <option value="under_review">⏳ Under Review</option>
+                        <option value="rejected">✗ Rejected</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="text-sm text-gray-600 font-medium">Notes</label>
+                    <textarea id="verify-notes" placeholder="Verification notes..." rows="3" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-green-500"></textarea>
+                </div>
+                
+                <div id="rejection-reason-field" class="hidden">
+                    <label class="text-sm text-gray-600 font-medium">Rejection Reason</label>
+                    <textarea id="verify-rejection-reason" placeholder="Reason for rejection..." rows="2" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-red-500"></textarea>
+                </div>
+                
+                <div class="flex space-x-3">
+                    <button type="submit" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg transition-all">Update Status</button>
+                    <button type="button" onclick="closeModal('verify-document-modal')" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-2 rounded-lg transition-all">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Candidate Documents Modal -->
+    <div id="candidate-documents-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-5xl w-full mx-4 max-h-90vh overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold text-gray-900"><i class="fas fa-folder-open text-cyan-500 mr-2"></i>Candidate Documents</h2>
+                    <button onclick="closeModal('candidate-documents-modal')" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="flex justify-between items-center mb-4">
+                    <div id="candidate-docs-info" class="text-gray-600">
+                        <!-- Candidate info will be populated -->
+                    </div>
+                    <button onclick="showUploadDocumentModal()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-all font-semibold shadow-md" style="z-index: 10; position: relative;">
+                        <i class="fas fa-upload mr-2"></i>Upload Document
+                    </button>
+                </div>
+                
+                <!-- Document filters -->
+                <div class="flex gap-4 mb-4 p-3 bg-gray-50 rounded-lg">
+                    <select id="doc-type-filter" onchange="filterCandidateDocuments()" class="border border-gray-300 rounded-lg px-3 py-1 text-sm">
+                        <option value="">All Types</option>
+                        <option value="resume">Resume</option>
+                        <option value="identity_proof">Identity Proof</option>
+                        <option value="education_certificate">Education</option>
+                        <option value="experience_letter">Experience</option>
+                        <option value="certification">Certification</option>
+                    </select>
+                    <select id="doc-status-filter" onchange="filterCandidateDocuments()" class="border border-gray-300 rounded-lg px-3 py-1 text-sm">
+                        <option value="">All Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="verified">Verified</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
+                </div>
+                
+                <div id="candidate-documents-list" class="space-y-3">
+                    <!-- Documents will be loaded here -->
+                </div>
+                
+                <div class="mt-6 flex justify-end">
+                    <button onclick="closeModal('candidate-documents-modal')" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-all">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>

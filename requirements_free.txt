@@ -1,0 +1,55 @@
+# Free Open Source Requirements (No Paid APIs)
+
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.0
+pydantic-settings==2.1.0
+
+# Database (Free Local)
+sqlalchemy==2.0.23
+asyncpg==0.29.0
+alembic==1.13.1
+psycopg2-binary==2.9.9
+
+# Security & Auth (Free)
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.6
+cryptography==41.0.8
+
+# File Handling (Free Local Storage)
+aiofiles==23.2.1
+python-magic==0.4.27
+PyPDF2==3.0.1
+python-docx==0.8.11
+
+# Optional Redis (Free Local)
+redis==5.0.1
+
+# HTTP Client (Free)
+httpx==0.25.2
+
+# Utilities (Free)
+python-dotenv==1.0.0
+email-validator==2.1.0
+Pillow==10.1.0
+python-dateutil==2.8.2
+
+# Development Tools (Free)
+pytest==7.4.3
+pytest-asyncio==0.21.1
+black==23.11.0
+isort==5.12.0
+flake8==6.1.0
+
+# REMOVED PAID SERVICES:
+# ❌ anthropic (PAID Claude API)
+# ❌ langchain (often requires paid APIs) 
+# ❌ minio (cloud storage costs)
+# ❌ celery (requires message broker setup)
+
+# FREE ALTERNATIVES INCLUDED:
+# ✅ Local file storage instead of S3/MinIO
+# ✅ Rule-based AI instead of paid Claude/OpenAI
+# ✅ Optional Ollama integration for free local AI
+# ✅ SQLite option for development (zero setup)
