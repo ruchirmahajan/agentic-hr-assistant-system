@@ -1,6 +1,7 @@
 """
 Open Source AI Service for HR Assistant (replaces Claude)
 Provides free alternatives to expensive AI services
+Now with Ollama LLM integration for enhanced AI capabilities!
 """
 from typing import Dict, Any, List, Optional
 import logging
@@ -8,18 +9,39 @@ import json
 import re
 from datetime import datetime
 
+from ..core.config import settings
+
 logger = logging.getLogger(__name__)
+
+# Import Ollama service (lazy import to avoid circular dependencies)
+_ollama_service = None
+
+def get_ollama_service():
+    """Lazy load Ollama service"""
+    global _ollama_service
+    if _ollama_service is None:
+        from .ollama_service import ollama_service
+        _ollama_service = ollama_service
+    return _ollama_service
 
 
 class OpenSourceClaudeService:
     """
-    Free open source replacement for Claude AI service
-    Uses rule-based processing and simple text analysis
+    Free open source replacement for Claude AI service.
+    
+    Now with Ollama integration!
+    - 🦙 Ollama LLM for intelligent analysis (when available)
+    - 📋 Rule-based fallback for reliability
+    - 🆓 100% FREE - No API costs ever
+    - 🔒 Privacy - All data stays local
     """
     
     def __init__(self):
-        """Initialize the free service"""
-        logger.info("Initialized open source HR AI service (Claude replacement)")
+        """Initialize the free service with Ollama support"""
+        logger.info("🤖 Initialized AI service with Ollama integration")
+        self._ollama_available = None
+        self._use_ollama = settings.AI_PROVIDER == "ollama"
+        
         self.skill_keywords = {
             "programming": ["python", "java", "javascript", "c++", "c#", "php", "ruby", "go", "rust"],
             "web": ["html", "css", "react", "angular", "vue", "node", "express", "django", "flask"],
@@ -35,14 +57,92 @@ class OpenSourceClaudeService:
             "created", "built", "designed", "implemented", "delivered"
         ]
     
+    async def _check_ollama_available(self) -> bool:
+        """Check if Ollama is available (cached)"""
+        if not self._use_ollama:
+            return False
+        if self._ollama_available is None:
+            try:
+                ollama = get_ollama_service()
+                self._ollama_available = await ollama.check_availability()
+                if self._ollama_available:
+                    logger.info("✅ Ollama is available for AI analysis")
+                else:
+                    logger.info("⚠️ Ollama not available, using rule-based analysis")
+            except Exception as e:
+                logger.warning(f"Ollama check failed: {e}")
+                self._ollama_available = False
+        return self._ollama_available
+    
     async def analyze_resume(
         self, 
         resume_text: str, 
         job_description: Optional[str] = None
     ) -> Dict[str, Any]:
         """
-        Analyze resume using free text processing
+        Analyze resume using Ollama LLM (if available) or rule-based processing.
+        
+        Priority:
+        1. Ollama LLM - Intelligent, context-aware analysis
+        2. Rule-based - Fast, reliable fallback
         """
+        try:
+            # Try Ollama first if available
+            if await self._check_ollama_available():
+                logger.info("🦙 Using Ollama for resume analysis")
+                return await self._analyze_with_ollama(resume_text, job_description)
+            
+            # Fallback to rule-based analysis
+            logger.info("📋 Using rule-based analysis")
+            return await self._analyze_with_rules(resume_text, job_description)
+            
+        except Exception as e:
+            logger.error(f"Resume analysis failed: {e}")
+            return self._fallback_analysis()
+    
+    async def _analyze_with_ollama(
+        self, 
+        resume_text: str, 
+        job_description: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """Analyze resume using Ollama LLM"""
+        try:
+            ollama = get_ollama_service()
+            analysis = await ollama.analyze_resume(
+                resume_text=resume_text,
+                job_description=job_description or "",
+                position_title=""
+            )
+            
+            return {
+                "overall_match_score": analysis.get("skill_match_percentage", 70) / 100,
+                "technical_skills": {"identified": analysis.get("skills", [])},
+                "experience_analysis": {
+                    "level": "analyzed_by_ai",
+                    "estimated_years": analysis.get("experience_years", 0),
+                    "summary": analysis.get("summary", "")
+                },
+                "education_analysis": {"has_degree": True, "degrees": []},
+                "strengths": analysis.get("strengths", []),
+                "concerns": analysis.get("concerns", []),
+                "interview_recommendations": analysis.get("interview_questions", []),
+                "confidence_score": 0.85,
+                "analysis_date": datetime.now().isoformat(),
+                "method": "ollama_llm",
+                "model": settings.OLLAMA_MODEL
+            }
+            
+        except Exception as e:
+            logger.warning(f"Ollama analysis failed, using fallback: {e}")
+            self._ollama_available = False
+            return await self._analyze_with_rules(resume_text, job_description)
+    
+    async def _analyze_with_rules(
+        self, 
+        resume_text: str, 
+        job_description: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """Analyze resume using rule-based processing"""
         try:
             text_lower = resume_text.lower()
             
@@ -68,13 +168,13 @@ class OpenSourceClaudeService:
                 "interview_recommendations": self._generate_interview_recommendations(skills),
                 "confidence_score": 0.8,
                 "analysis_date": datetime.now().isoformat(),
-                "method": "open_source_text_analysis"
+                "method": "rule_based_analysis"
             }
             
             return analysis
             
         except Exception as e:
-            logger.error(f"Resume analysis failed: {e}")
+            logger.error(f"Rule-based analysis failed: {e}")
             return self._fallback_analysis()
     
     async def generate_interview_questions(
@@ -84,12 +184,27 @@ class OpenSourceClaudeService:
         question_count: int = 5
     ) -> List[str]:
         """
-        Generate interview questions using template-based approach
+        Generate interview questions using Ollama or template-based approach.
         """
         try:
             skills = candidate_profile.get("skills", [])
+            if not skills:
+                skills = list(candidate_profile.get("technical_skills", {}).get("identified", []))
             experience = candidate_profile.get("experience_level", "mid")
             
+            # Try Ollama first
+            if await self._check_ollama_available():
+                logger.info("🦙 Using Ollama for interview questions")
+                ollama = get_ollama_service()
+                questions = await ollama.generate_interview_questions(
+                    job_title=job_description[:100] if job_description else "General Position",
+                    skills=skills[:10],
+                    experience_level=experience
+                )
+                if questions:
+                    return questions[:question_count]
+            
+            # Fallback to template-based
             questions = []
             
             # Generic questions
@@ -414,6 +529,97 @@ Please submit your resume and cover letter detailing your relevant experience fo
             "strengths": ["Candidate applied for position"],
             "gaps": ["To be assessed during interview"],
             "recommendation": "proceed_with_interview"
+        }
+    
+    async def get_ai_status(self) -> Dict[str, Any]:
+        """
+        Get current AI service status.
+        
+        Returns information about which AI provider is active and available.
+        """
+        ollama_available = await self._check_ollama_available()
+        ollama_models = []
+        
+        if ollama_available:
+            try:
+                ollama = get_ollama_service()
+                ollama_models = await ollama.list_models()
+            except:
+                pass
+        
+        return {
+            "provider": "ollama" if ollama_available else "rule-based",
+            "ollama": {
+                "enabled": self._use_ollama,
+                "available": ollama_available,
+                "base_url": settings.OLLAMA_BASE_URL,
+                "model": settings.OLLAMA_MODEL,
+                "installed_models": ollama_models
+            },
+            "fallback": {
+                "type": "rule-based",
+                "available": True
+            },
+            "status": "operational",
+            "features": [
+                "Resume analysis",
+                "Skill extraction",
+                "Experience estimation",
+                "Interview question generation",
+                "Job fit scoring"
+            ]
+        }
+    
+    async def summarize_candidate(self, resume_text: str, job_title: str = "") -> str:
+        """Generate a brief candidate summary"""
+        if await self._check_ollama_available():
+            try:
+                ollama = get_ollama_service()
+                return await ollama.summarize_candidate(resume_text, job_title)
+            except:
+                pass
+        
+        # Rule-based summary
+        analysis = await self._analyze_with_rules(resume_text, None)
+        skills = analysis.get("technical_skills", {})
+        exp = analysis.get("experience_analysis", {})
+        
+        skill_list = []
+        for cat, items in skills.items():
+            skill_list.extend(items[:3])
+        
+        parts = []
+        if exp.get("estimated_years"):
+            parts.append(f"{exp['estimated_years']} years of experience")
+        if skill_list:
+            parts.append(f"Skills: {', '.join(skill_list[:5])}")
+        
+        return ". ".join(parts) + "." if parts else "Candidate profile requires manual review."
+    
+    async def score_candidate(
+        self, 
+        resume_text: str, 
+        job_requirements: str
+    ) -> Dict[str, Any]:
+        """Score candidate against job requirements"""
+        if await self._check_ollama_available():
+            try:
+                ollama = get_ollama_service()
+                return await ollama.score_candidate(resume_text, job_requirements)
+            except:
+                pass
+        
+        # Rule-based scoring
+        analysis = await self._analyze_with_rules(resume_text, job_requirements)
+        match_score = analysis.get("overall_match_score", 0.5)
+        
+        return {
+            "skills_score": int(match_score * 100),
+            "experience_score": 50,
+            "education_score": 50,
+            "culture_fit_score": 50,
+            "overall_score": int(match_score * 100),
+            "provider": "rule-based"
         }
 
 

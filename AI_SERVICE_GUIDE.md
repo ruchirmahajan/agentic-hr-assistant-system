@@ -2,11 +2,11 @@
 
 <div align="center">
 
-![AI](https://img.shields.io/badge/AI-Rule--Based-green.svg)
+![AI](https://img.shields.io/badge/AI-Ollama%20%2B%20Rule--Based-green.svg)
 ![Cost](https://img.shields.io/badge/Cost-$0%20Free-brightgreen.svg)
 ![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)
 
-**Complete guide to utilizing the Free Rule-based AI Service in the HR Assistant**
+**Complete guide to utilizing FREE AI Services (Ollama + Rule-based) in the HR Assistant**
 
 </div>
 
@@ -16,6 +16,7 @@
 
 - [Overview](#-overview)
 - [AI Service Options](#-ai-service-options)
+- [🦙 Ollama Integration (NEW!)](#-ollama-integration-new)
 - [Free Rule-Based AI](#-free-rule-based-ai)
 - [Step-by-Step Integration](#-step-by-step-integration)
 - [API Usage Examples](#-api-usage-examples)
@@ -31,12 +32,181 @@ The HR Assistant supports multiple AI providers for candidate analysis and resum
 
 | Provider | Cost | Features | Setup Difficulty |
 |----------|------|----------|------------------|
+| **🦙 Ollama** | 🆓 Free | Advanced LLM analysis, local inference | ⭐⭐ Medium |
 | **Rule-Based** | 🆓 Free | Basic skill matching, keyword extraction | ⭐ Easy |
-| **Ollama** | 🆓 Free | Advanced analysis, local LLM | ⭐⭐ Medium |
 | **Anthropic Claude** | 💰 Paid | Best accuracy, advanced reasoning | ⭐⭐ Medium |
 | **OpenAI** | 💰 Paid | High quality, fast responses | ⭐⭐ Medium |
 
-This guide focuses on the **Free Rule-Based AI** which requires **NO API keys** and **NO external services**.
+This guide focuses on **FREE AI options** which require **NO API keys** and **NO external services**.
+
+---
+
+## 🦙 Ollama Integration (NEW!)
+
+### What is Ollama?
+
+[Ollama](https://ollama.ai) is a free, open-source tool that lets you run large language models (LLMs) locally on your machine. It provides:
+
+- 🆓 **100% FREE** - No API costs, ever
+- 🔒 **Privacy** - All data stays on your machine
+- ⚡ **Fast** - GPU acceleration supported
+- 🎯 **Multiple Models** - Llama2, Mistral, CodeLlama, and more
+
+### Quick Setup (5 minutes)
+
+#### Step 1: Install Ollama
+
+**Windows:**
+```bash
+# Download from https://ollama.ai/download
+# Or using winget:
+winget install Ollama.Ollama
+```
+
+**macOS:**
+```bash
+brew install ollama
+```
+
+**Linux:**
+```bash
+curl -fsSL https://ollama.ai/install.sh | sh
+```
+
+#### Step 2: Start Ollama
+
+```bash
+# Start Ollama service
+ollama serve
+```
+
+Or on Windows, Ollama starts automatically after installation.
+
+#### Step 3: Download a Model
+
+```bash
+# Download Llama2 (recommended for HR tasks)
+ollama pull llama2
+
+# Or Mistral (faster, good quality)
+ollama pull mistral
+
+# Or smaller model for less powerful machines
+ollama pull phi
+```
+
+**Model Recommendations:**
+
+| Model | Size | RAM Required | Best For |
+|-------|------|--------------|----------|
+| `llama2` | 3.8 GB | 8 GB | Best quality |
+| `mistral` | 4.1 GB | 8 GB | Fast & accurate |
+| `phi` | 1.6 GB | 4 GB | Low-resource machines |
+| `llama2:13b` | 7.3 GB | 16 GB | Maximum quality |
+
+#### Step 4: Configure the App
+
+Update your `.env` file:
+
+```env
+# AI Configuration
+AI_PROVIDER=ollama
+OLLAMA_BASE_URL=http://localhost:11434
+OLLAMA_MODEL=llama2
+OLLAMA_TIMEOUT=120
+```
+
+#### Step 5: Verify Installation
+
+```bash
+# List installed models
+ollama list
+
+# Test the model
+ollama run llama2 "Hello, can you help with HR tasks?"
+```
+
+### API Endpoints
+
+#### Check AI Status
+```bash
+curl http://localhost:8000/api/v1/dashboard/ai-status
+```
+
+Response:
+```json
+{
+  "success": true,
+  "data": {
+    "provider": "ollama",
+    "ollama": {
+      "enabled": true,
+      "available": true,
+      "base_url": "http://localhost:11434",
+      "model": "llama2",
+      "installed_models": ["llama2:latest", "mistral:latest"]
+    },
+    "fallback": {
+      "type": "rule-based",
+      "available": true
+    },
+    "status": "operational"
+  }
+}
+```
+
+### Ollama Features in HR Assistant
+
+| Feature | Description |
+|---------|-------------|
+| **Resume Analysis** | Intelligent parsing with context understanding |
+| **Skill Extraction** | Deep skill identification beyond keywords |
+| **Experience Estimation** | Smart inference of experience level |
+| **Interview Questions** | Tailored questions based on candidate profile |
+| **Job Fit Scoring** | Comprehensive scoring with reasoning |
+| **Candidate Summary** | Natural language summaries |
+
+### Code Example: Using Ollama Service
+
+```python
+from src.services.ollama_service import ollama_service
+
+# Check if Ollama is available
+is_available = await ollama_service.check_availability()
+print(f"Ollama available: {is_available}")
+
+# List installed models
+models = await ollama_service.list_models()
+print(f"Models: {models}")
+
+# Analyze a resume
+analysis = await ollama_service.analyze_resume(
+    resume_text="John Doe - Software Engineer with 5 years Python...",
+    job_description="Looking for Python developer with FastAPI experience",
+    position_title="Senior Python Developer"
+)
+print(f"Skills: {analysis['skills']}")
+print(f"Match: {analysis['skill_match_percentage']}%")
+
+# Generate interview questions
+questions = await ollama_service.generate_interview_questions(
+    job_title="Senior Python Developer",
+    skills=["python", "fastapi", "postgresql"],
+    experience_level="senior"
+)
+for q in questions:
+    print(f"- {q}")
+```
+
+### Fallback Behavior
+
+The system automatically falls back to rule-based analysis if:
+- Ollama is not running
+- No models are installed
+- Request times out
+- Any error occurs
+
+This ensures the app always works, even without Ollama.
 
 ---
 
